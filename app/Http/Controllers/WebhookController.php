@@ -9,7 +9,6 @@ class WebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        // Verify GitHub signature
         $secret = 'Admin@12345';
         $signature = $request->header('X-Hub-Signature-256');
 
@@ -26,15 +25,12 @@ class WebhookController extends Controller
             return response()->json(['error' => 'Invalid signature'], 403);
         }
 
-        // Get the event type
         $event = $request->header('X-GitHub-Event');
         Log::info('Webhook received: ' . $event);
 
-        // Handle push event - auto deploy
         if ($event === 'push') {
             $branch = $request->input('ref', '');
 
-            // Only deploy on push to main/master branch
             if (str_ends_with($branch, '/main') || str_ends_with($branch, '/master')) {
                 $projectPath = '/var/www/kelompok1-pemweb2';
                 $output = [];
